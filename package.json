@@ -1,6 +1,6 @@
 {
   "name": "denoup",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Upgrades to the latest version of Deno, or manages more versions of Deno on the same machine, as simple es rustup.",
   "license": "MIT"
 }

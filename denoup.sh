@@ -287,7 +287,7 @@ detect_platform() {
 
 check_remote_tool_version_exists() {
     local VER=$1
-    TOOL_URL_PKG="$REPO_URL/releases/download/$VER/$PKG_NAME"
+    TOOL_URL_PKG="$REPO_URL/releases/download/v$VER/$PKG_NAME"
     start_debug "checking $TOOL_URL_PKG"
     TOOL_EXISTS=$(command curl -LfI "$PROGRESS" "$TOOL_URL_PKG") ||
         fail 'failed accessing' "$TOOL_URL_PKG"
@@ -368,7 +368,7 @@ get_remote_tool_versions() {
         DESC=""
     fi
     start_debug "downloading $TOOL_URL_LIST"
-    TOOL_REMOTE_VERSIONS=$(command curl -f "$PROGRESS" "$TOOL_URL_LIST" | command jq -r '.[].name' | command sort -V${DESC}) ||
+    TOOL_REMOTE_VERSIONS=$(command curl -f "$PROGRESS" "$TOOL_URL_LIST" | command jq -r '.[].name' | command sed -E "s/^v([.0-9]+)$/\1/g" | command sort -V${DESC}) ||
         fail 'failed downloading and processing' "the output from $TOOL_URL_LIST"
     end_debug
 }
@@ -379,11 +379,11 @@ get_latest_remote_version() {
     TOOL_LATEST_VER=$(command curl -f "$PROGRESS" "$TOOL_URL_LATEST") ||
         fail 'failed downloading' "from $TOOL_URL_LATEST"
     end_debug
-    if ! [[ "$TOOL_LATEST_VER" =~ \"tag_name\":.?\"([.[:alpha:][:digit:]]+)\" ]]; then
+    if ! [[ "$TOOL_LATEST_VER" =~ \"tag_name\":.?\"v([.[:alpha:][:digit:]]+)\" ]]; then
         fail 'failed recognising' "version in $TOOL_LATEST_VER"
     fi
     TOOL_LATEST_VER=${BASH_REMATCH[1]}
-    TOOL_URL_PKG=${TOOL_URL_PKG-$REPO_URL/releases/download/$TOOL_LATEST_VER/$PKG_NAME}
+    TOOL_URL_PKG=${TOOL_URL_PKG-$REPO_URL/releases/download/v$TOOL_LATEST_VER/$PKG_NAME}
 }
 
 find_remote_tool_version_by_arg() {
